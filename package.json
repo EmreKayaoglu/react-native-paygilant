@@ -1,0 +1,26 @@
+{
+  "name": "react-native-paygilant",
+  "version": "1.0.1",
+  "description": "React Native Paygilant SDK",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EmreKayaoglu/react-native-paygilant.git"
+  },
+  "keywords": [
+    "react",
+    "native",
+    "paygilant",
+    "android",
+    "ios"
+  ],
+  "author": "Emre Kayaoglu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EmreKayaoglu/react-native-paygilant/issues"
+  },
+  "homepage": "https://github.com/EmreKayaoglu/react-native-paygilant#readme"
+}
