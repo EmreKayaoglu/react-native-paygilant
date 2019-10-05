@@ -1,12 +1,16 @@
 package com.ptc.reactnative.paygilant;
 
+import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.ReadableArray;
 import com.paygilant.PG_FraudDetection_SDK.Biometric.PaygilantScreenListener;
+import com.paygilant.PG_FraudDetection_SDK.Communication.PaygilantCommunication;
 import com.paygilant.PG_FraudDetection_SDK.PaygilantManager;
 import com.paygilant.pgdata.CheckPoint.CheckPoint;
 import com.paygilant.pgdata.CheckPoint.CheckPointStatus;
@@ -23,14 +27,16 @@ import java.util.Map;
 
 public class PaygilantModule extends ReactContextBaseJavaModule {
 
+    private static final String TAG = "PaygilantModule";
     private final ReactApplicationContext reactContext;
-    private ArrayList<PaygilantScreenListener> screenListenerArray;
+    private ArrayList<PaygilantScreenListenerWrapper> screenListenerArray;
+    private ArrayList<CheckPoint> checkPointArray;
 
     public PaygilantModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
         screenListenerArray = new ArrayList<>();
-
+        checkPointArray = new ArrayList<>();
     }
 
     @Override
@@ -88,23 +94,25 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
      * Function : getRiskForCheckPoint
      * Called when arriving at the predefined checkpoints, and the application needs to get Paygilant’s Risk Score.
      */
-//    @ReactMethod
-//    public void getRiskForCheckPoint(CheckPoint checkPoint, final PaygilantCommunication communicationObj, Callback callback) {
-//        String requestID = PaygilantManager.getInstance(reactContext).getRiskForCheckPoint(checkPoint, communicationObj);
-//        callback.invoke((requestID));
-//    }
+    @ReactMethod
+    public void getRiskForCheckPoint(String checkPointType, final Callback callback) {
+        CheckPoint checkPoint = getCheckPoint(checkPointType);
+        final String requestID = PaygilantManager.getInstance(reactContext).getRiskForCheckPoint(checkPoint, new PaygilantCommunication() {
+            @Override
+            public void receiveRisk(int i, String s, String s1) {
+
+            }
+        });
+        callback.invoke((requestID));
+    }
 
     /**
      * Function : arriveToCheckPoint
      */
     @ReactMethod
     public void arriveToCheckPoint(String checkPointType) {
-        PaygilantManager.getInstance(reactContext).arriveToCheckPoint(new CheckPoint(CheckPointType.valueOf(checkPointType)) {
-            @Override
-            public JSONObject getJson() {
-                return null;
-            }
-        });
+        CheckPoint checkPoint = getCheckPoint(checkPointType);
+        PaygilantManager.getInstance(reactContext).arriveToCheckPoint(checkPoint);
     }
 
     /**
@@ -115,7 +123,6 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
     public void updateCheckPointStatus(String type, String requestID, String status, String transactionID) {
         PaygilantManager.getInstance(reactContext).updateCheckPointStatus(CheckPointType.valueOf(type), requestID, CheckPointStatus.valueOf(status), transactionID);
     }
-
 
     /**
      * Function : setUserId
@@ -138,7 +145,8 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
 
         if (rootView != null) {
             PaygilantScreenListener listener = PaygilantManager.getInstance(reactContext).startNewScreenListener(ScreenListenerType.valueOf(type), actionID, getCurrentActivity(), rootView);
-            screenListenerArray.add(listener);
+            PaygilantScreenListenerWrapper wrapper = new PaygilantScreenListenerWrapper(listener, actionID);
+            screenListenerArray.add(wrapper);
             if (successCallback != null)
                 successCallback.invoke(actionID);
         } else {
@@ -146,17 +154,19 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
                 errorCallback.invoke("Can't find root View");
         }
     }
+
     /**
      * Function : resumeListen
      * Call resumeListen inside onResume() activity method, in order to listen for sensors’ events which occurred during the activity lifetime
      */
     @ReactMethod
     public void resumeListen(int listenerID) {
-        for (PaygilantScreenListener listener:screenListenerArray) {
-//            if (listener.id == listenerID) {
-//                listener.resumeListen();
-//                break;
-//            }
+        for (PaygilantScreenListenerWrapper wrapper:screenListenerArray) {
+            if (wrapper._id == listenerID) {
+                Log.i(TAG, "PaygilantScreenListener("+ listenerID + ") resumeListen");
+                wrapper.listener.resumeListen();
+                break;
+            }
         }
     }
 
@@ -164,26 +174,75 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
      * Function : pauseListenToSensors
      * Should be called on the onPause() activity method. Can be called also during app interaction when tracking screen touches but not the sensors.
      */
-//    @ReactMethod
-//    public void pauseListenToSensors(PaygilantScreenListener listener) {
-//        listener.pauseListenToSensors();
-//    }
+    @ReactMethod
+    public void pauseListenToSensors(int listenerID) {
+        for (PaygilantScreenListenerWrapper wrapper:screenListenerArray) {
+            if (wrapper._id == listenerID) {
+                Log.i(TAG, "PaygilantScreenListener("+ listenerID + ") pauseListenToSensors");
+                wrapper.listener.pauseListenToSensors();
+                break;
+            }
+        }
+    }
 
     /**
      * StartTouchListener
      * Should be called during Activity onCreate()
      */
-//    @ReactMethod
-//    public void StartTouchListener(PaygilantScreenListener listener) {
-//        listener.StartTouchListener(getCurrentActivity());
-//    }
+    @ReactMethod
+    public void StartTouchListener(int listenerID) {
+        for (PaygilantScreenListenerWrapper wrapper:screenListenerArray) {
+            if (wrapper._id == listenerID) {
+                Log.i(TAG, "PaygilantScreenListener("+ listenerID + ") pauseListenToSensors");
+                wrapper.listener.StartTouchListener(getCurrentActivity());
+                break;
+            }
+        }
+    }
 
     /**
-     * Function : receiveRisk
+     * Function : onRequestPermissionsResult
      */
     @ReactMethod
-    public void receiveRisk () {
-//        PaygilantManager.init(reactContext,RNModu
-//        leConst.SERVER_URL,null);
+    public void onRequestPermissionsResult(int requestCode, ReadableArray permissions, ReadableArray grantResults) {
+        int p1 = (permissions != null) ? permissions.size() : 0;
+        int p2 = (grantResults != null) ? grantResults.size() : 0;
+        String[] strPermissions = new String[p1];
+        int[] intGrantResults = new int[p2];
+
+        if (permissions != null && permissions.size() > 0) {
+            for (int i = 0; i < permissions.size(); i++) {
+                strPermissions[i] = permissions.getString(i);
+            }
+        }
+
+        if (grantResults != null && grantResults.size() > 0) {
+            for (int i = 0; i < grantResults.size(); i++) {
+                intGrantResults[i] = grantResults.getInt(i);
+            }
+        }
+
+        PaygilantManager.getInstance(reactContext).onRequestPermissionsResult(requestCode, strPermissions, intGrantResults);
+    }
+
+    private CheckPoint getCheckPoint(String checkPointType) {
+        CheckPoint checkPoint = null;
+        for (CheckPoint cp:checkPointArray) {
+            if (cp.getType() == CheckPointType.valueOf(checkPointType)) {
+                checkPoint = cp;
+                break;
+            }
+        }
+        if (checkPoint == null) {
+            checkPoint = new CheckPoint(CheckPointType.valueOf(checkPointType)) {
+                @Override
+                public JSONObject getJson() {
+                    return null;
+                }
+            };
+            checkPointArray.add(checkPoint);
+        }
+
+        return checkPoint;
     }
 }
