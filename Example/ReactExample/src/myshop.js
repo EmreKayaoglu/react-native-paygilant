@@ -4,9 +4,12 @@ import { TouchableHighlight, Text, View, Image, Platform, StyleSheet } from 'rea
 export default class MyshopScreen extends Component {
     constructor(props) {
         super(props)
+        this.state = {
+            requestID: ""
+        }
     }
 
-    componentWillMount() {
+    componentWillMount() {        
     }
 
     componentWillUnmount() {

@@ -1,16 +1,33 @@
 import React, { Component } from 'react'
-import { TouchableHighlight, Text, View, TextInput, Platform, StyleSheet } from 'react-native'
+import { TouchableHighlight, Text, View, TextInput, Platform, StyleSheet, AppState } from 'react-native'
 
 export default class MainScreen extends Component {
     constructor(props) {
         super(props)
+        this.state = {
+            appState: AppState.currentState,
+            paygilantListenerID: 100,
+            requestID: "",
+        }
     }
 
-    componentWillMount() {
+    componentDidMount() {
+        AppState.addEventListener('change', this._handleAppStateChange);
     }
 
     componentWillUnmount() {
+        AppState.removeEventListener('change', this._handleAppStateChange);
     }
+
+    _handleAppStateChange = (nextAppState) => {
+        if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+            console.log('App has come to the foreground!');
+        } else {//if (this.state.appState.match(/active/) && (nextAppState === 'inactive' || nextAppState === 'background')) {
+            console.log('App has come to the background!');
+        }
+        this.setState({ appState: nextAppState });
+    };
+
 
     sendMoney() {
     }

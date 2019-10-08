@@ -1,7 +1,7 @@
 {
   "name": "react-native-paygilant",
   "title": "React Native Paygilant",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "React Native Paygilant SDK",
   "main": "index.js",
   "scripts": {
