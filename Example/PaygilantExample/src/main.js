@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 import { TouchableHighlight, Text, View, TextInput, Platform, StyleSheet, AppState } from 'react-native'
 import Paygilant from 'react-native-paygilant'
+import { NativeEventEmitter, NativeModules } from 'react-native';
 
 export default class MainScreen extends Component {
     constructor(props) {
         super(props)
         this.state = {
+            userId: this.props.navigation.state.params.userId,
             appState: AppState.currentState,
             paygilantListenerID: 100,
             requestID: null,
@@ -21,6 +23,16 @@ export default class MainScreen extends Component {
 
     componentDidMount() {
         AppState.addEventListener('change', this._handleAppStateChange);
+
+        // receive event from native code for getRiskForCheckPoint
+        const eventEmitter = new NativeEventEmitter(NativeModules.ToastExample)
+        eventEmitter.addListener('RiskforCheckPointEvent', (event) => {
+            var riskLevel = event.riskLevel
+            var signedRisk = event.signedRisk
+            var requestId = event.requestId
+            
+            alert("Receive event from " + requestId + ": riskLevel=" + riskLevel + ", signedRisk=" + signedRisk)
+        })
     }
 
     componentWillUnmount() {
@@ -44,11 +56,13 @@ export default class MainScreen extends Component {
 
 
     sendMoney() {
-        Paygilant.getRiskForCheckPoint(Paygilant.CheckPointType.TYPE_GENERAL, (requestID) => { this.setState({ requestID: requestID }) })
+        Paygilant.getRiskForCheckPoint(Paygilant.TransactionType.PURCHASE, new Date().getTime(), Paygilant.CurrencyCode.USD, this.state.userId, 50, "DestinationID_1", "CreditCardISRACRAD_8794", (requestID) => {
+            this.setState({ requestID: requestID })
+        })
     }
 
     myshop() {
-        Paygilant.getRiskForCheckPoint(Paygilant.CheckPointType.TYPE_GENERAL, (requestID) => {
+        Paygilant.getRiskForCheckPoint(Paygilant.TransactionType.PURCHASE, new Date().getTime(), Paygilant.CurrencyCode.USD, this.state.userId, 50, "DestinationID_1", "CreditCardISRACRAD_8794", (requestID) => {
             this.setState({ requestID: requestID })
             this.props.navigation.push("Myshop", { requestID: requestID })
         })

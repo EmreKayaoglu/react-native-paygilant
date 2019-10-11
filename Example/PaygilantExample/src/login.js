@@ -21,7 +21,7 @@ export default class LoginScreen extends Component {
         if (this.state.username != '') {
             Paygilant.setUserId(this.state.username)
             Paygilant.arriveToCheckPoint(Paygilant.CheckPointType.TYPE_LOGIN)
-            this.props.navigation.push("Main")
+            this.props.navigation.push("Main",  { userId: this.state.username })
         }
     }
 
