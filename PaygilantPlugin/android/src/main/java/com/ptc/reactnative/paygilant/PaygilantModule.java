@@ -24,6 +24,7 @@ import com.paygilant.pgdata.CheckPoint.ScreenListenerType;
 import com.paygilant.pgdata.CheckPoint.Transaction;
 import com.paygilant.pgdata.CheckPoint.TransactionType;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Array;
@@ -57,7 +58,7 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
     @Override
     public Map<String, Object> getConstants() {
         final Map<String, Object> constants = new HashMap<>();
-        constants.put("ScreenListenerType", Collections.unmodifiableMap(new HashMap<String, Object>(){{
+        constants.put("ScreenListenerType", Collections.unmodifiableMap(new HashMap<String, Object>() {{
             put("SCREEN_REGISTRATION_FORM", "REGISTRATION_FORM");
             put("SCREEN_LOGIN_FORM", "LOGIN_FORM");
             put("SCREEN_MAIN", "MAIN_SCREEN");
@@ -74,7 +75,7 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
             put("SCREEN_WITHDRAW", "WITHDRAW_SCREEN");
         }}));
 
-        constants.put("CheckPointType", Collections.unmodifiableMap(new HashMap<String, Object>(){{
+        constants.put("CheckPointType", Collections.unmodifiableMap(new HashMap<String, Object>() {{
             put("TYPE_LAUNCH", "LAUNCH");
             put("TYPE_REGISTER", "REGISTER");
             put("TYPE_LOGIN", "LOGIN");
@@ -84,7 +85,7 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
             put("TYPE_GENERAL", "GENERAL");
         }}));
 
-        constants.put("TransactionType", Collections.unmodifiableMap(new HashMap<String, Object>(){{
+        constants.put("TransactionType", Collections.unmodifiableMap(new HashMap<String, Object>() {{
             put("PURCHASE", "PURCHASE");
             put("MONEY_TRANSFER", "MONEY_TRANSFER");
             put("DEPOSIT", "DEPOSIT");
@@ -96,43 +97,192 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
             put("ONLINE_STORE", "ONLINE_STORE");
         }}));
 
-        constants.put("CheckPointStatus", Collections.unmodifiableMap(new HashMap<String, Object>(){{
+        constants.put("CheckPointStatus", Collections.unmodifiableMap(new HashMap<String, Object>() {{
             put("STATUS_APPROVED", "APPROVED");
             put("STATUS_DENIED", "DENIED");
             put("STATUS_CANCELLED", "CANCELLED");
         }}));
 
-        constants.put("CurrencyCode", Collections.unmodifiableMap(new HashMap<String, Object>(){{
-            put("AFN", "AFN"); put("EUR", "EUR"); put("ALL", "ALL"); put("DZD", "DZD"); put("USD", "USD"); put("AOA", "AOA");
-            put("XCD", "XCD"); put("ARS", "ARS"); put("AMD", "AMD"); put("AWG", "AWG"); put("AUD", "AUD"); put("AZN", "AZN");
-            put("BSD", "BSD"); put("BHD", "BHD"); put("BDT", "BDT"); put("BBD", "BBD"); put("BYN", "BYN"); put("BZD", "BZD");
-            put("XOF", "XOF"); put("BMD", "BMD"); put("INR", "INR"); put("BTN", "BTN"); put("BOB", "BOB"); put("BOV", "BOV");
-            put("BAM", "BAM"); put("BWP", "BWP"); put("NOK", "NOK"); put("BRL", "BRL"); put("BND", "BND"); put("BGN", "BGN");
-            put("BIF", "BIF"); put("CVE", "CVE"); put("KHR", "KHR"); put("XAF", "XAF"); put("CAD", "CAD"); put("KYD", "KYD");
-            put("CLP", "CLP"); put("CLF", "CLF"); put("CNY", "CNY"); put("COP", "COP"); put("COU", "COU"); put("KMF", "KMF");
-            put("CDF", "CDF"); put("NZD", "NZD"); put("CRC", "CRC"); put("HRK", "HRK"); put("CUP", "CUP"); put("CUC", "CUC");
-            put("ANG", "ANG"); put("CZK", "CZK"); put("DKK", "DKK"); put("DJF", "DJF"); put("DOP", "DOP"); put("EGP", "EGP");
-            put("SVC", "SVC"); put("ERN", "ERN"); put("ETB", "ETB"); put("FKP", "FKP"); put("FJD", "FJD"); put("XPF", "XPF");
-            put("GMD", "GMD"); put("GEL", "GEL"); put("GHS", "GHS"); put("GIP", "GIP"); put("GTQ", "GTQ"); put("GBP", "GBP");
-            put("GNF", "GNF"); put("GYD", "GYD"); put("HTG", "HTG"); put("HNL", "HNL"); put("HKD", "HKD"); put("HUF", "HUF");
-            put("ISK", "ISK"); put("IDR", "IDR"); put("XDR", "XDR"); put("IRR", "IRR"); put("IQD", "IQD"); put("ILS", "ILS");
-            put("JMD", "JMD"); put("JPY", "JPY"); put("JOD", "JOD"); put("KZT", "KZT"); put("KES", "KES"); put("KPW", "KPW");
-            put("KRW", "KRW"); put("KWD", "KWD"); put("KGS", "KGS"); put("LAK", "LAK"); put("LBP", "LBP"); put("LSL", "LSL");
-            put("ZAR", "ZAR"); put("LRD", "LRD"); put("LYD", "LYD"); put("CHF", "CHF"); put("MOP", "MOP"); put("MKD", "MKD");
-            put("MGA", "MGA"); put("MWK", "MWK"); put("MYR", "MYR"); put("MVR", "MVR"); put("MRU", "MRU"); put("MUR", "MUR");
-            put("XUA", "XUA"); put("MXN", "MXN"); put("MXV", "MXV"); put("MDL", "MDL"); put("MNT", "MNT"); put("MAD", "MAD");
-            put("MZN", "MZN"); put("MMK", "MMK"); put("NAD", "NAD"); put("NPR", "NPR"); put("NIO", "NIO"); put("NGN", "NGN");
-            put("OMR", "OMR"); put("PKR", "PKR"); put("PAB", "PAB"); put("PGK", "PGK"); put("PYG", "PYG"); put("PEN", "PEN");
-            put("PHP", "PHP"); put("PLN", "PLN"); put("QAR", "QAR"); put("RON", "RON"); put("RUB", "RUB"); put("RWF", "RWF");
-            put("SHP", "SHP"); put("WST", "WST"); put("STN", "STN"); put("SAR", "SAR"); put("RSD", "RSD"); put("SCR", "SCR");
-            put("SLL", "SLL"); put("SGD", "SGD"); put("XSU", "XSU"); put("SBD", "SBD"); put("SOS", "SOS"); put("SSP", "SSP");
-            put("LKR", "LKR"); put("SDG", "SDG"); put("SRD", "SRD"); put("SZL", "SZL"); put("SEK", "SEK"); put("CHE", "CHE");
-            put("CHW", "CHW"); put("SYP", "SYP"); put("TWD", "TWD"); put("TJS", "TJS"); put("TZS", "TZS"); put("THB", "THB");
-            put("TOP", "TOP"); put("TTD", "TTD"); put("TND", "TND"); put("TRY", "TRY"); put("TMT", "TMT"); put("UGX", "UGX");
-            put("UAH", "UAH"); put("AED", "AED"); put("USN", "USN"); put("UYU", "UYU"); put("UYI", "UYI"); put("UYW", "UYW");
-            put("UZS", "UZS"); put("VUV", "VUV"); put("VES", "VES"); put("VND", "VND"); put("YER", "YER"); put("ZMW", "ZMW");
-            put("ZWL", "ZWL"); put("XBA", "XBA"); put("XBB", "XBB"); put("XBC", "XBC"); put("XBD", "XBD"); put("XTS", "XTS");
-            put("XXX", "XXX"); put("XAU", "XAU"); put("XPD", "XPD"); put("XPT", "XPT"); put("XAG", "XAG");
+        constants.put("CurrencyCode", Collections.unmodifiableMap(new HashMap<String, Object>() {{
+            put("AFN", "AFN");
+            put("EUR", "EUR");
+            put("ALL", "ALL");
+            put("DZD", "DZD");
+            put("USD", "USD");
+            put("AOA", "AOA");
+            put("XCD", "XCD");
+            put("ARS", "ARS");
+            put("AMD", "AMD");
+            put("AWG", "AWG");
+            put("AUD", "AUD");
+            put("AZN", "AZN");
+            put("BSD", "BSD");
+            put("BHD", "BHD");
+            put("BDT", "BDT");
+            put("BBD", "BBD");
+            put("BYN", "BYN");
+            put("BZD", "BZD");
+            put("XOF", "XOF");
+            put("BMD", "BMD");
+            put("INR", "INR");
+            put("BTN", "BTN");
+            put("BOB", "BOB");
+            put("BOV", "BOV");
+            put("BAM", "BAM");
+            put("BWP", "BWP");
+            put("NOK", "NOK");
+            put("BRL", "BRL");
+            put("BND", "BND");
+            put("BGN", "BGN");
+            put("BIF", "BIF");
+            put("CVE", "CVE");
+            put("KHR", "KHR");
+            put("XAF", "XAF");
+            put("CAD", "CAD");
+            put("KYD", "KYD");
+            put("CLP", "CLP");
+            put("CLF", "CLF");
+            put("CNY", "CNY");
+            put("COP", "COP");
+            put("COU", "COU");
+            put("KMF", "KMF");
+            put("CDF", "CDF");
+            put("NZD", "NZD");
+            put("CRC", "CRC");
+            put("HRK", "HRK");
+            put("CUP", "CUP");
+            put("CUC", "CUC");
+            put("ANG", "ANG");
+            put("CZK", "CZK");
+            put("DKK", "DKK");
+            put("DJF", "DJF");
+            put("DOP", "DOP");
+            put("EGP", "EGP");
+            put("SVC", "SVC");
+            put("ERN", "ERN");
+            put("ETB", "ETB");
+            put("FKP", "FKP");
+            put("FJD", "FJD");
+            put("XPF", "XPF");
+            put("GMD", "GMD");
+            put("GEL", "GEL");
+            put("GHS", "GHS");
+            put("GIP", "GIP");
+            put("GTQ", "GTQ");
+            put("GBP", "GBP");
+            put("GNF", "GNF");
+            put("GYD", "GYD");
+            put("HTG", "HTG");
+            put("HNL", "HNL");
+            put("HKD", "HKD");
+            put("HUF", "HUF");
+            put("ISK", "ISK");
+            put("IDR", "IDR");
+            put("XDR", "XDR");
+            put("IRR", "IRR");
+            put("IQD", "IQD");
+            put("ILS", "ILS");
+            put("JMD", "JMD");
+            put("JPY", "JPY");
+            put("JOD", "JOD");
+            put("KZT", "KZT");
+            put("KES", "KES");
+            put("KPW", "KPW");
+            put("KRW", "KRW");
+            put("KWD", "KWD");
+            put("KGS", "KGS");
+            put("LAK", "LAK");
+            put("LBP", "LBP");
+            put("LSL", "LSL");
+            put("ZAR", "ZAR");
+            put("LRD", "LRD");
+            put("LYD", "LYD");
+            put("CHF", "CHF");
+            put("MOP", "MOP");
+            put("MKD", "MKD");
+            put("MGA", "MGA");
+            put("MWK", "MWK");
+            put("MYR", "MYR");
+            put("MVR", "MVR");
+            put("MRU", "MRU");
+            put("MUR", "MUR");
+            put("XUA", "XUA");
+            put("MXN", "MXN");
+            put("MXV", "MXV");
+            put("MDL", "MDL");
+            put("MNT", "MNT");
+            put("MAD", "MAD");
+            put("MZN", "MZN");
+            put("MMK", "MMK");
+            put("NAD", "NAD");
+            put("NPR", "NPR");
+            put("NIO", "NIO");
+            put("NGN", "NGN");
+            put("OMR", "OMR");
+            put("PKR", "PKR");
+            put("PAB", "PAB");
+            put("PGK", "PGK");
+            put("PYG", "PYG");
+            put("PEN", "PEN");
+            put("PHP", "PHP");
+            put("PLN", "PLN");
+            put("QAR", "QAR");
+            put("RON", "RON");
+            put("RUB", "RUB");
+            put("RWF", "RWF");
+            put("SHP", "SHP");
+            put("WST", "WST");
+            put("STN", "STN");
+            put("SAR", "SAR");
+            put("RSD", "RSD");
+            put("SCR", "SCR");
+            put("SLL", "SLL");
+            put("SGD", "SGD");
+            put("XSU", "XSU");
+            put("SBD", "SBD");
+            put("SOS", "SOS");
+            put("SSP", "SSP");
+            put("LKR", "LKR");
+            put("SDG", "SDG");
+            put("SRD", "SRD");
+            put("SZL", "SZL");
+            put("SEK", "SEK");
+            put("CHE", "CHE");
+            put("CHW", "CHW");
+            put("SYP", "SYP");
+            put("TWD", "TWD");
+            put("TJS", "TJS");
+            put("TZS", "TZS");
+            put("THB", "THB");
+            put("TOP", "TOP");
+            put("TTD", "TTD");
+            put("TND", "TND");
+            put("TRY", "TRY");
+            put("TMT", "TMT");
+            put("UGX", "UGX");
+            put("UAH", "UAH");
+            put("AED", "AED");
+            put("USN", "USN");
+            put("UYU", "UYU");
+            put("UYI", "UYI");
+            put("UYW", "UYW");
+            put("UZS", "UZS");
+            put("VUV", "VUV");
+            put("VES", "VES");
+            put("VND", "VND");
+            put("YER", "YER");
+            put("ZMW", "ZMW");
+            put("ZWL", "ZWL");
+            put("XBA", "XBA");
+            put("XBB", "XBB");
+            put("XBC", "XBC");
+            put("XBD", "XBD");
+            put("XTS", "XTS");
+            put("XXX", "XXX");
+            put("XAU", "XAU");
+            put("XPD", "XPD");
+            put("XPT", "XPT");
+            put("XAG", "XAG");
         }}));
 
         return constants;
@@ -143,7 +293,7 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void init() {
-        PaygilantManager.init(reactContext, AppConstant.SERVER_URL,null);
+        PaygilantManager.init(reactContext, AppConstant.SERVER_URL, null);
     }
 
     /**
@@ -151,20 +301,22 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
      * Called when arriving at the predefined checkpoints, and the application needs to get Paygilant’s Risk Score.
      */
     @ReactMethod
-    public void getRiskForCheckPoint(String transactionType, double time_stamp, String curType, String userID, double amount, String destinationId, String paymentMethod, final Callback callback) {
-        Transaction transaction = getTransaction(transactionType, time_stamp, curType, userID, amount, destinationId, paymentMethod);
-        final String requestID = PaygilantManager.getInstance(reactContext).getRiskForCheckPoint(transaction, new PaygilantCommunication() {
-            @Override
-            public void receiveRisk(int riskLevel, String signedRisk, String requestId) {
-                // send event to javascript side
-                WritableMap params = Arguments.createMap();
-                params.putInt("riskLevel", riskLevel);
-                params.putString("signedRisk", signedRisk);
-                params.putString("requestId", requestId);
-                sendEvent(reactContext, "RiskforCheckPointEvent", params);
-            }
-        });
-        callback.invoke((requestID));
+    public void getRiskForCheckPoint(String jsonStr, final Callback callback) {
+        Transaction transaction = getTransaction(jsonStr);
+        if (transaction != null) {
+            final String requestID = PaygilantManager.getInstance(reactContext).getRiskForCheckPoint(transaction, new PaygilantCommunication() {
+                @Override
+                public void receiveRisk(int riskLevel, String signedRisk, String requestId) {
+                    // send event to javascript side
+                    WritableMap params = Arguments.createMap();
+                    params.putInt("riskLevel", riskLevel);
+                    params.putString("signedRisk", signedRisk);
+                    params.putString("requestId", requestId);
+                    sendEvent(reactContext, "RiskforCheckPointEvent", params);
+                }
+            });
+            callback.invoke((requestID));
+        }
     }
 
     /**
@@ -222,9 +374,9 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void resumeListen(int listenerID) {
-        for (PaygilantScreenListenerWrapper wrapper:screenListenerArray) {
+        for (PaygilantScreenListenerWrapper wrapper : screenListenerArray) {
             if (wrapper._id == listenerID) {
-                Log.i(TAG, "PaygilantScreenListener("+ listenerID + ") resumeListen");
+                Log.i(TAG, "PaygilantScreenListener(" + listenerID + ") resumeListen");
                 wrapper.listener.resumeListen();
                 break;
             }
@@ -237,9 +389,9 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void pauseListenToSensors(int listenerID) {
-        for (PaygilantScreenListenerWrapper wrapper:screenListenerArray) {
+        for (PaygilantScreenListenerWrapper wrapper : screenListenerArray) {
             if (wrapper._id == listenerID) {
-                Log.i(TAG, "PaygilantScreenListener("+ listenerID + ") pauseListenToSensors");
+                Log.i(TAG, "PaygilantScreenListener(" + listenerID + ") pauseListenToSensors");
                 wrapper.listener.pauseListenToSensors();
                 break;
             }
@@ -252,9 +404,9 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void StartTouchListener(int listenerID) {
-        for (PaygilantScreenListenerWrapper wrapper:screenListenerArray) {
+        for (PaygilantScreenListenerWrapper wrapper : screenListenerArray) {
             if (wrapper._id == listenerID) {
-                Log.i(TAG, "PaygilantScreenListener("+ listenerID + ") pauseListenToSensors");
+                Log.i(TAG, "PaygilantScreenListener(" + listenerID + ") pauseListenToSensors");
                 wrapper.listener.StartTouchListener(getCurrentActivity());
                 break;
             }
@@ -286,14 +438,30 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
         PaygilantManager.getInstance(reactContext).onRequestPermissionsResult(requestCode, strPermissions, intGrantResults);
     }
 
-    private Transaction getTransaction(String transactionType, double time_stamp, String curType, String userID, double amount, String destinationId, String paymentMethod) {
-        Transaction tr = new Transaction(new Date((long)time_stamp), TransactionType.valueOf(transactionType), CurrencyCode.valueOf(curType), userID, amount, destinationId, paymentMethod);
-        return  tr;
+    private Transaction getTransaction(String jsonStr) {
+        try {
+            Log.d("Json string from JS: ", jsonStr);
+            JSONObject object = new JSONObject(jsonStr);
+            long timeStamp = Long.parseLong(object.getString("timeStamp"));
+            TransactionType transactionType = TransactionType.valueOf(object.getString("transactionType"));
+            CurrencyCode currencyCode = CurrencyCode.valueOf(object.getString("curType"));
+            String userID = object.getString("userID");
+            double amount = Double.parseDouble(object.getString("amount"));
+            String destinationId = object.getString("destinationId");
+            String paymentMethod = object.getString("paymentMethod");
+
+            Log.d("Json string from JS: ", "" + timeStamp + "," + transactionType + "," + currencyCode + "," + userID + "," + amount + "," + destinationId + "," + paymentMethod);
+
+            Transaction tr = new Transaction(new Date(timeStamp), transactionType, currencyCode, userID, amount, destinationId, paymentMethod);
+            return tr;
+        } catch (JSONException e) {
+            return null;
+        }
     }
 
     private CheckPoint getCheckPoint(String checkPointType) {
         CheckPoint checkPoint = null;
-        for (CheckPoint cp:checkPointArray) {
+        for (CheckPoint cp : checkPointArray) {
             if (cp.getType() == CheckPointType.valueOf(checkPointType)) {
                 checkPoint = cp;
                 break;
