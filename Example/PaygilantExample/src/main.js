@@ -3,7 +3,7 @@ import { TouchableHighlight, Text, View, TextInput, Platform, StyleSheet, AppSta
 import Paygilant from 'react-native-paygilant'
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
-import { getJsonFromCheckPoint, getNewCheckPoint } from './components/CheckPoint'
+import { getJsonFromCheckPoint, getNewTransactionCheckPoint } from './components/CheckPoint'
 
 export default class MainScreen extends Component {
     constructor(props) {
@@ -58,32 +58,32 @@ export default class MainScreen extends Component {
 
 
     sendMoney() {
-        var checkpoint = getNewCheckPoint()
-        checkpoint.transactionType = Paygilant.TransactionType.PURCHASE
-        checkpoint.timeStamp = new Date().getTime()
-        checkpoint.curType = Paygilant.CurrencyCode.USD
-        checkpoint.userID = this.state.userId
-        checkpoint.amount = 50
-        checkpoint.destinationId = "DestinationID_1"
-        checkpoint.paymentMethod = "CreditCardISRACRAD_8794"
+        var transaction = getNewTransactionCheckPoint()
+        transaction.transactionType = Paygilant.TransactionType.PURCHASE
+        transaction.timeStamp = new Date().getTime()
+        transaction.curType = Paygilant.CurrencyCode.USD
+        transaction.userID = this.state.userId
+        transaction.amount = 50
+        transaction.destinationId = "DestinationID_1"
+        transaction.paymentMethod = "CreditCardISRACRAD_8794"
 
         // alert(getJsonFromCheckPoint(checkpoint))
-        Paygilant.getRiskForCheckPoint(getJsonFromCheckPoint(checkpoint), (requestID) => {
+        Paygilant.getRiskForCheckPoint(getJsonFromCheckPoint(transaction), (requestID) => {
             this.setState({ requestID: requestID })
         })
     }
 
     myshop() {
-        var checkpoint = getNewCheckPoint()
-        checkpoint.transactionType = Paygilant.TransactionType.PURCHASE
-        checkpoint.timeStamp = new Date().getTime()
-        checkpoint.curType = Paygilant.CurrencyCode.USD
-        checkpoint.userID = this.state.userId
-        checkpoint.amount = 100
-        checkpoint.destinationId = "DestinationID_2"
-        checkpoint.paymentMethod = "CreditCardISRACRAD_8794"
+        var transaction = getNewTransactionCheckPoint()
+        transaction.transactionType = Paygilant.TransactionType.PURCHASE
+        transaction.timeStamp = new Date().getTime()
+        transaction.curType = Paygilant.CurrencyCode.USD
+        transaction.userID = this.state.userId
+        transaction.amount = 100
+        transaction.destinationId = "DestinationID_2"
+        transaction.paymentMethod = "CreditCardISRACRAD_8795"
 
-        Paygilant.getRiskForCheckPoint(getJsonFromCheckPoint(checkpoint), (requestID) => {
+        Paygilant.getRiskForCheckPoint(getJsonFromCheckPoint(transaction), (requestID) => {
             this.setState({ requestID: requestID })
             this.props.navigation.push("Myshop", { requestID: requestID })
         })

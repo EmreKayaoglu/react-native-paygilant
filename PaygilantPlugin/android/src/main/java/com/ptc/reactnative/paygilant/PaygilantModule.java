@@ -16,13 +16,25 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.paygilant.PG_FraudDetection_SDK.Biometric.PaygilantScreenListener;
 import com.paygilant.PG_FraudDetection_SDK.Communication.PaygilantCommunication;
 import com.paygilant.PG_FraudDetection_SDK.PaygilantManager;
+import com.paygilant.pgdata.CheckPoint.AddPaymentMethod;
 import com.paygilant.pgdata.CheckPoint.CheckPoint;
 import com.paygilant.pgdata.CheckPoint.CheckPointStatus;
 import com.paygilant.pgdata.CheckPoint.CheckPointType;
 import com.paygilant.pgdata.CheckPoint.CurrencyCode;
+import com.paygilant.pgdata.CheckPoint.General;
+import com.paygilant.pgdata.CheckPoint.Launch;
+import com.paygilant.pgdata.CheckPoint.Login;
+import com.paygilant.pgdata.CheckPoint.Registration;
 import com.paygilant.pgdata.CheckPoint.ScreenListenerType;
 import com.paygilant.pgdata.CheckPoint.Transaction;
 import com.paygilant.pgdata.CheckPoint.TransactionType;
+import com.paygilant.pgdata.CheckPoint.UpdateDetails;
+import com.paygilant.pgdata.CheckPoint.param.Address;
+import com.paygilant.pgdata.CheckPoint.param.BankAccountDetails;
+import com.paygilant.pgdata.CheckPoint.param.CreditCardDetail;
+import com.paygilant.pgdata.CheckPoint.param.Payment;
+import com.paygilant.pgdata.CheckPoint.param.PaymentMethodType;
+import com.paygilant.pgdata.CheckPoint.param.User;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -101,6 +113,19 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
             put("STATUS_APPROVED", "APPROVED");
             put("STATUS_DENIED", "DENIED");
             put("STATUS_CANCELLED", "CANCELLED");
+        }}));
+
+        constants.put("VerificationType", Collections.unmodifiableMap(new HashMap<String, Object>() {{
+            put("STATUS_VERIFIED", "VERIFIED");
+            put("STATUS_NOT_VERIFIED", "NOT_VERIFIED");
+            put("STATUS_UNKNOWN", "UNKNOWN");
+        }}));
+
+        constants.put("PaymentMethodType", Collections.unmodifiableMap(new HashMap<String, Object>() {{
+            put("TYPE_CREDIT_CARD", "CREDIT_CARD");
+            put("TYPE_BANK_ACCOUNT", "BANK_ACCOUNT");
+            put("TYPE_ECHECK", "ECHECK");
+            put("TYPE_UNKNOWN", "UNKNOWN");
         }}));
 
         constants.put("CurrencyCode", Collections.unmodifiableMap(new HashMap<String, Object>() {{
@@ -302,9 +327,9 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void getRiskForCheckPoint(String jsonStr, final Callback callback) {
-        Transaction transaction = getTransaction(jsonStr);
-        if (transaction != null) {
-            final String requestID = PaygilantManager.getInstance(reactContext).getRiskForCheckPoint(transaction, new PaygilantCommunication() {
+        CheckPoint checkPoint = getCheckPointFromJson(jsonStr);
+        if (checkPoint != null) {
+            final String requestID = PaygilantManager.getInstance(reactContext).getRiskForCheckPoint(checkPoint, new PaygilantCommunication() {
                 @Override
                 public void receiveRisk(int riskLevel, String signedRisk, String requestId) {
                     // send event to javascript side
@@ -438,27 +463,6 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
         PaygilantManager.getInstance(reactContext).onRequestPermissionsResult(requestCode, strPermissions, intGrantResults);
     }
 
-    private Transaction getTransaction(String jsonStr) {
-        try {
-            Log.d("Json string from JS: ", jsonStr);
-            JSONObject object = new JSONObject(jsonStr);
-            long timeStamp = Long.parseLong(object.getString("timeStamp"));
-            TransactionType transactionType = TransactionType.valueOf(object.getString("transactionType"));
-            CurrencyCode currencyCode = CurrencyCode.valueOf(object.getString("curType"));
-            String userID = object.getString("userID");
-            double amount = Double.parseDouble(object.getString("amount"));
-            String destinationId = object.getString("destinationId");
-            String paymentMethod = object.getString("paymentMethod");
-
-            Log.d("Json string from JS: ", "" + timeStamp + "," + transactionType + "," + currencyCode + "," + userID + "," + amount + "," + destinationId + "," + paymentMethod);
-
-            Transaction tr = new Transaction(new Date(timeStamp), transactionType, currencyCode, userID, amount, destinationId, paymentMethod);
-            return tr;
-        } catch (JSONException e) {
-            return null;
-        }
-    }
-
     private CheckPoint getCheckPoint(String checkPointType) {
         CheckPoint checkPoint = null;
         for (CheckPoint cp : checkPointArray) {
@@ -486,5 +490,99 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
         reactContext
                 .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit(eventName, params);
+    }
+
+    private CheckPoint getCheckPointFromJson(String jsonStr) {
+        try {
+            Log.d("Json string from JS: ", jsonStr);
+            JSONObject object = new JSONObject(jsonStr);
+            CheckPoint checkPoint;
+
+            String checkPointType = object.getString("checkPointType");
+            if (CheckPointType.valueOf(checkPointType) == CheckPointType.LAUNCH) {
+                Launch launch = new Launch();
+                checkPoint = launch;
+            } else if (CheckPointType.valueOf(checkPointType) == CheckPointType.REGISTER) {
+                String userId = object.getString("userID");
+                String email = object.getString("email");
+                String phoneNumber = object.getString("phoneNumber");
+
+                Registration registration = new Registration(userId, email, phoneNumber);
+                checkPoint = registration;
+            } else if (CheckPointType.valueOf(checkPointType) == CheckPointType.LOGIN) {
+                String userId = object.getString("userID");
+                String email = object.getString("email");
+                String phoneNumber = object.getString("phoneNumber");
+
+                Login login = new Login(userId, email, phoneNumber);
+                checkPoint = login;
+            } else if (CheckPointType.valueOf(checkPointType) == CheckPointType.TRANSACTION) {
+                TransactionType transactionType = TransactionType.valueOf(object.getString("transactionType"));
+                long timeStamp = Long.parseLong(object.getString("timeStamp"));
+                CurrencyCode currencyCode = CurrencyCode.valueOf(object.getString("curType"));
+                String userID = object.getString("userID");
+                double amount = Double.parseDouble(object.getString("amount"));
+                String destinationId = object.getString("destinationId");
+                String paymentMethod = object.getString("paymentMethod");
+
+                Transaction tr = new Transaction(new Date(timeStamp), transactionType, currencyCode, userID, amount, destinationId, paymentMethod);
+                checkPoint = tr;
+            } else if (CheckPointType.valueOf(checkPointType) == CheckPointType.UPDATE_DETAILS) {
+                String userID = object.getString("userID");
+
+                UpdateDetails details = new UpdateDetails(userID);
+                checkPoint = details;
+            } else if (CheckPointType.valueOf(checkPointType) == CheckPointType.ADD_PAYMENT_METHOD) {
+                String userID = object.getString("userID");
+                User user = new User();
+                user.setUserId(userID);
+
+                // Payment details
+                Payment payment = new Payment();
+                payment.setPaymentMethod(PaymentMethodType.valueOf(object.getString("paymentMethod")));
+                payment.setProcessor(object.getString("processor"));
+                payment.setFullNameOnCard(object.getString("fullNameOnCard"));
+
+                // CreditCardDetail
+                String cardToken = object.getString("cardToken");
+                String cardId = object.getString("cardId");
+                String bin = object.getString("bin");
+                String lastFourDigit = object.getString("lastFourDigit");
+                int yearExpiryDate = Integer.parseInt(object.getString("yearExpiryDate"));
+                int monthExpiryDate = Integer.parseInt(object.getString("monthExpiryDate"));
+                CreditCardDetail cardDetail = new CreditCardDetail(cardToken, cardId, bin, lastFourDigit, yearExpiryDate, monthExpiryDate);
+                payment.setCreditCardDetail(cardDetail);
+
+                // BankAccountDetails
+                String number = object.getString("number");
+                String fullName = object.getString("fullName");
+                String bsb = object.getString("bsb");
+                BankAccountDetails accountDetails = new BankAccountDetails(number, fullName, bsb);
+                payment.setBankAccountDetails(accountDetails);
+                // * end payment detail
+
+                // billingAddress
+                String firstName = object.getString("firstName");
+                String lastName = object.getString("lastName");
+                String addressLine1 = object.getString("addressLine1");
+                String addressLine2 = object.getString("addressLine2");
+                String city = object.getString("city");
+                String state = object.getString("state");
+                String country = object.getString("country");
+                String postalCode = object.getString("postalCode");
+                String phoneNumber = object.getString("phoneNumber");
+                Address billingAddress = new Address(firstName,lastName, addressLine1, addressLine2, city, state, country, postalCode, phoneNumber);
+
+                AddPaymentMethod paymentMethod = new AddPaymentMethod(user, payment, billingAddress);
+                checkPoint = paymentMethod;
+            } else { // if (CheckPointType.valueOf(checkPointType) == CheckPointType.GENERAL) {
+                General general = new General();
+                checkPoint = general;
+            }
+
+            return checkPoint;
+        } catch (JSONException e) {
+            return null;
+        }
     }
 }
