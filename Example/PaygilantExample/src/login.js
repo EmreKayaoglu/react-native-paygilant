@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { TouchableHighlight, Text, View, TextInput, Platform, StyleSheet } from 'react-native'
-import Paygilant from 'react-native-paygilant'
+import Paygilant, { CheckpointType } from 'react-native-paygilant'
 
 export default class LoginScreen extends Component {
     constructor(props) {
@@ -20,8 +20,8 @@ export default class LoginScreen extends Component {
     login() {
         if (this.state.username != '') {
             Paygilant.setUserId(this.state.username)
-            Paygilant.arriveToCheckPoint(Paygilant.CheckPointType.TYPE_LOGIN)
-            this.props.navigation.push("Main",  { userId: this.state.username })
+            Paygilant.arriveToCheckPoint(CheckpointType.LOGIN)
+            this.props.navigation.push("Main", { userId: this.state.username })
         }
     }
 

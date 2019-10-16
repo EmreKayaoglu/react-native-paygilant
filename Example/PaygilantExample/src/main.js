@@ -1,9 +1,7 @@
 import React, { Component } from 'react'
 import { TouchableHighlight, Text, View, TextInput, Platform, StyleSheet, AppState } from 'react-native'
-import Paygilant from 'react-native-paygilant'
+import Paygilant, { Transaction, User, CurrencyCode, TransactionType, Address, PaymentMethodType } from 'react-native-paygilant'
 import { NativeEventEmitter, NativeModules } from 'react-native';
-
-import { getJsonFromCheckPoint, getNewTransactionCheckPoint } from './components/CheckPoint'
 
 export default class MainScreen extends Component {
     constructor(props) {
@@ -58,32 +56,34 @@ export default class MainScreen extends Component {
 
 
     sendMoney() {
-        var transaction = getNewTransactionCheckPoint()
-        transaction.transactionType = Paygilant.TransactionType.PURCHASE
+        var transaction = Transaction
         transaction.timeStamp = new Date().getTime()
-        transaction.curType = Paygilant.CurrencyCode.USD
-        transaction.userID = this.state.userId
+        transaction.user.userId = this.state.userId
         transaction.amount = 50
-        transaction.destinationId = "DestinationID_1"
-        transaction.paymentMethod = "CreditCardISRACRAD_8794"
+        transaction.curType = CurrencyCode.USD
+        transaction.transactionType = TransactionType.PURCHASE
+        transaction.destinationId ="DestinationID_1"
+        transaction.payment.paymentMethod = PaymentMethodType.CREDIT_CARD
+        transaction.payment.creditCardDetail.lastFourDigit = "8794"
 
-        // alert(getJsonFromCheckPoint(checkpoint))
-        Paygilant.getRiskForCheckPoint(getJsonFromCheckPoint(transaction), (requestID) => {
+        // alert(JSON.stringify(transaction))
+        Paygilant.getRiskForCheckPoint(JSON.stringify(transaction), (requestID) => {
             this.setState({ requestID: requestID })
         })
     }
 
     myshop() {
-        var transaction = getNewTransactionCheckPoint()
-        transaction.transactionType = Paygilant.TransactionType.PURCHASE
+        var transaction = Transaction
         transaction.timeStamp = new Date().getTime()
-        transaction.curType = Paygilant.CurrencyCode.USD
-        transaction.userID = this.state.userId
+        transaction.user.userId = this.state.userId
         transaction.amount = 100
-        transaction.destinationId = "DestinationID_2"
-        transaction.paymentMethod = "CreditCardISRACRAD_8795"
+        transaction.curType = CurrencyCode.USD
+        transaction.transactionType = TransactionType.PURCHASE
+        transaction.destinationId ="DestinationID_2"
+        transaction.payment.paymentMethod = PaymentMethodType.CREDIT_CARD
+        transaction.payment.creditCardDetail.lastFourDigit = "8799"
 
-        Paygilant.getRiskForCheckPoint(getJsonFromCheckPoint(transaction), (requestID) => {
+        Paygilant.getRiskForCheckPoint(JSON.stringify(transaction), (requestID) => {
             this.setState({ requestID: requestID })
             this.props.navigation.push("Myshop", { requestID: requestID })
         })

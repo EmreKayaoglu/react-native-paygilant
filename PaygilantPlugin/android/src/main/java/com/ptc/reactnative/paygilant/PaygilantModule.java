@@ -498,82 +498,25 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
             JSONObject object = new JSONObject(jsonStr);
             CheckPoint checkPoint;
 
-            String checkPointType = object.getString("checkPointType");
+            String checkPointType = object.getString("type");
             if (CheckPointType.valueOf(checkPointType) == CheckPointType.LAUNCH) {
                 Launch launch = new Launch();
                 checkPoint = launch;
             } else if (CheckPointType.valueOf(checkPointType) == CheckPointType.REGISTER) {
-                String userId = object.getString("userID");
-                String email = object.getString("email");
-                String phoneNumber = object.getString("phoneNumber");
-
-                Registration registration = new Registration(userId, email, phoneNumber);
+                Registration registration = JsonParseUtils.getRegistrationFromJson(object);
                 checkPoint = registration;
             } else if (CheckPointType.valueOf(checkPointType) == CheckPointType.LOGIN) {
-                String userId = object.getString("userID");
-                String email = object.getString("email");
-                String phoneNumber = object.getString("phoneNumber");
-
-                Login login = new Login(userId, email, phoneNumber);
+                Login login = JsonParseUtils.getLoginFromJson(object);
                 checkPoint = login;
             } else if (CheckPointType.valueOf(checkPointType) == CheckPointType.TRANSACTION) {
-                TransactionType transactionType = TransactionType.valueOf(object.getString("transactionType"));
-                long timeStamp = Long.parseLong(object.getString("timeStamp"));
-                CurrencyCode currencyCode = CurrencyCode.valueOf(object.getString("curType"));
-                String userID = object.getString("userID");
-                double amount = Double.parseDouble(object.getString("amount"));
-                String destinationId = object.getString("destinationId");
-                String paymentMethod = object.getString("paymentMethod");
-
-                Transaction tr = new Transaction(new Date(timeStamp), transactionType, currencyCode, userID, amount, destinationId, paymentMethod);
+                Transaction tr = JsonParseUtils.getTransactionFromJson(object);
                 checkPoint = tr;
             } else if (CheckPointType.valueOf(checkPointType) == CheckPointType.UPDATE_DETAILS) {
                 String userID = object.getString("userID");
-
                 UpdateDetails details = new UpdateDetails(userID);
                 checkPoint = details;
             } else if (CheckPointType.valueOf(checkPointType) == CheckPointType.ADD_PAYMENT_METHOD) {
-                String userID = object.getString("userID");
-                User user = new User();
-                user.setUserId(userID);
-
-                // Payment details
-                Payment payment = new Payment();
-                payment.setPaymentMethod(PaymentMethodType.valueOf(object.getString("paymentMethod")));
-                payment.setProcessor(object.getString("processor"));
-                payment.setFullNameOnCard(object.getString("fullNameOnCard"));
-
-                // CreditCardDetail
-                String cardToken = object.getString("cardToken");
-                String cardId = object.getString("cardId");
-                String bin = object.getString("bin");
-                String lastFourDigit = object.getString("lastFourDigit");
-                int yearExpiryDate = Integer.parseInt(object.getString("yearExpiryDate"));
-                int monthExpiryDate = Integer.parseInt(object.getString("monthExpiryDate"));
-                CreditCardDetail cardDetail = new CreditCardDetail(cardToken, cardId, bin, lastFourDigit, yearExpiryDate, monthExpiryDate);
-                payment.setCreditCardDetail(cardDetail);
-
-                // BankAccountDetails
-                String number = object.getString("number");
-                String fullName = object.getString("fullName");
-                String bsb = object.getString("bsb");
-                BankAccountDetails accountDetails = new BankAccountDetails(number, fullName, bsb);
-                payment.setBankAccountDetails(accountDetails);
-                // * end payment detail
-
-                // billingAddress
-                String firstName = object.getString("firstName");
-                String lastName = object.getString("lastName");
-                String addressLine1 = object.getString("addressLine1");
-                String addressLine2 = object.getString("addressLine2");
-                String city = object.getString("city");
-                String state = object.getString("state");
-                String country = object.getString("country");
-                String postalCode = object.getString("postalCode");
-                String phoneNumber = object.getString("phoneNumber");
-                Address billingAddress = new Address(firstName,lastName, addressLine1, addressLine2, city, state, country, postalCode, phoneNumber);
-
-                AddPaymentMethod paymentMethod = new AddPaymentMethod(user, payment, billingAddress);
+                AddPaymentMethod paymentMethod = JsonParseUtils.getAddPaymentMethodFromJson(object);
                 checkPoint = paymentMethod;
             } else { // if (CheckPointType.valueOf(checkPointType) == CheckPointType.GENERAL) {
                 General general = new General();
