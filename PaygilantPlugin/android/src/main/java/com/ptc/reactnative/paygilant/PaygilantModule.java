@@ -317,7 +317,7 @@ public class PaygilantModule extends ReactContextBaseJavaModule {
      * Function : init
      */
     @ReactMethod
-    public void init() {
+    public void initialize() {
         PaygilantManager.init(reactContext, AppConstant.SERVER_URL, null);
     }
 

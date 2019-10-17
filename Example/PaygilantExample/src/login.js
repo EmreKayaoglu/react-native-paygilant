@@ -8,7 +8,7 @@ export default class LoginScreen extends Component {
         this.state = {
             username: ''
         }
-        Paygilant.init()
+        Paygilant.initialize()
     }
 
     componentWillMount() {
