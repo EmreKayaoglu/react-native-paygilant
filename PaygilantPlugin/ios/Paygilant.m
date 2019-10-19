@@ -1,4 +1,5 @@
 #import "Paygilant.h"
+@import PaygilantSDK
 
 
 @implementation Paygilant

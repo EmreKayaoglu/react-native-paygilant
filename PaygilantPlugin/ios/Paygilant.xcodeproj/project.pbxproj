@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		B3E7B58A1CC2AC0600A0062D /* Paygilant.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* Paygilant.m */; };
+		F8666D66235A900200AF7FFD /* JsonParseUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = F8666D65235A900200AF7FFD /* JsonParseUtils.m */; };
+		F8666D69235A901000AF7FFD /* PaygilantSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F8666D68235A901000AF7FFD /* PaygilantSDK.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,6 +28,10 @@
 		134814201AA4EA6300B7C361 /* libPaygilant.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPaygilant.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B3E7B5881CC2AC0600A0062D /* Paygilant.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Paygilant.h; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* Paygilant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Paygilant.m; sourceTree = "<group>"; };
+		F8666D63235A900100AF7FFD /* AppConstant.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppConstant.h; sourceTree = "<group>"; };
+		F8666D64235A900100AF7FFD /* JsonParseUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JsonParseUtils.h; sourceTree = "<group>"; };
+		F8666D65235A900200AF7FFD /* JsonParseUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JsonParseUtils.m; sourceTree = "<group>"; };
+		F8666D68235A901000AF7FFD /* PaygilantSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PaygilantSDK.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,6 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F8666D69235A901000AF7FFD /* PaygilantSDK.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -50,10 +57,22 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				F8666D63235A900100AF7FFD /* AppConstant.h */,
+				F8666D64235A900100AF7FFD /* JsonParseUtils.h */,
+				F8666D65235A900200AF7FFD /* JsonParseUtils.m */,
 				B3E7B5881CC2AC0600A0062D /* Paygilant.h */,
 				B3E7B5891CC2AC0600A0062D /* Paygilant.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
+				F8666D67235A901000AF7FFD /* Frameworks */,
 			);
+			sourceTree = "<group>";
+		};
+		F8666D67235A901000AF7FFD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F8666D68235A901000AF7FFD /* PaygilantSDK.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -113,6 +132,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B3E7B58A1CC2AC0600A0062D /* Paygilant.m in Sources */,
+				F8666D66235A900200AF7FFD /* JsonParseUtils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -215,8 +235,12 @@
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				HEADER_SEARCH_PATHS = (
-				"$(inherited)",
+					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)/../../../React/**",
 					"$(SRCROOT)/../../react-native/React/**",
@@ -231,6 +255,10 @@
 		58B511F11A9E6C8500147676 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,

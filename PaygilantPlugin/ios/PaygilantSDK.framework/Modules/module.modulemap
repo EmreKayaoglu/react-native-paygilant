@@ -1,0 +1,11 @@
+framework module PaygilantSDK {
+  umbrella header "PaygilantSDK.h"
+
+  export *
+  module * { export * }
+}
+
+module PaygilantSDK.Swift {
+    header "PaygilantSDK-Swift.h"
+    requires objc
+}
